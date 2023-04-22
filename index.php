@@ -32,3 +32,6 @@ ercContract.methods.totalSupply().call().then(totalSupply => {
 }).catch(error => {
   console.error(error);
 });
+<html>
+  test
+</html>
