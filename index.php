@@ -1,46 +1,34 @@
-<html>
-test
-</html>
-<?php
+const Web3 = require('web3');
 
-$rpcEndpoint = 'https://rpc-mainnet.ankr.network';
-$contractAddress = '0xc8faF90F8fcA363E261d8d1892A31a636aA1ef5C';
+// Create a new instance of Web3 with Ankr's RPC endpoint
+const web3 = new Web3('https://rpc-mainnet.ankr.network');
 
-// Build the JSON-RPC request payload
-$requestPayload = [
-    'jsonrpc' => '2.0',
-    'method' => 'eth_call',
-    'params' => [
-        [
-            'to' => $contractAddress,
-            'data' => '0x18160ddd'
-        ],
-        'latest'
-    ],
-    'id' => 1
+// The contract address for the ERC token
+const contractAddress = '0xc8faF90F8fcA363E261d8d1892A31a636aA1ef5C';
+
+// The ABI for the ERC token contract
+const abi = [
+  {
+    "constant":true,
+    "inputs":[],
+    "name":"totalSupply",
+    "outputs":[{"name":"","type":"uint256"}],
+    "payable":false,
+    "stateMutability":"view",
+    "type":"function"
+  }
 ];
 
-// Convert the request payload to JSON
-$requestJson = json_encode($requestPayload);
+// Create a new instance of the ERC token contract
+const ercContract = new web3.eth.Contract(abi, contractAddress);
 
-// Send the JSON-RPC request to the Ankr RPC endpoint
-$ch = curl_init($rpcEndpoint);
-curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-curl_setopt($ch, CURLOPT_POSTFIELDS, $requestJson);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Content-Type: application/json',
-    'Content-Length: ' . strlen($requestJson)
-]);
-$responseJson = curl_exec($ch);
-curl_close($ch);
+// Call the totalSupply() function on the ERC token contract
+ercContract.methods.totalSupply().call().then(totalSupply => {
+  // Convert the total supply from wei to ETH
+  const totalSupplyEth = web3.utils.fromWei(totalSupply, 'ether');
 
-// Decode the JSON-RPC response
-$response = json_decode($responseJson, true);
-
-// Extract the total supply from the response
-$totalSupplyHex = $response['result'];
-$totalSupply = hexdec($totalSupplyHex) / pow(10, 18); // Convert from wei to ETH
-
-// Output the total supply
-echo "Total Supply: $totalSupply ETH\n";
+  // Output the total supply
+  console.log(`Total Supply: ${totalSupplyEth} ETH`);
+}).catch(error => {
+  console.error(error);
+});
