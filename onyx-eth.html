@@ -24,7 +24,7 @@
     ercContract.methods.totalSupply().call().then(totalSupply => {
       const totalSupplyEth = web3.utils.fromWei(totalSupply, 'ether');
       const outputDiv = document.getElementById('output');
-      outputDiv.innerHTML = `Total Supply: ${totalSupplyEth}`;
+      outputDiv.innerHTML = `${totalSupplyEth}`;
     }).catch(error => {
       console.error(error);
     });
